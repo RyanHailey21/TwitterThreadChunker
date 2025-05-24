@@ -22,3 +22,7 @@ Thumbs.db
 
 # Extension files
 .repomix/
+
+# Streamlit secrets (contains API keys)
+.streamlit/
+secrets.toml

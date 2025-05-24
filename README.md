@@ -18,12 +18,22 @@ Transform your long thoughts into perfectly sized Twitter threads!
 
 ## 📁 What's in This Folder
 
+### Main Files
 - **`setup.bat`** - One-time setup (creates venv & installs dependencies)
 - **`run_twitter_chunker.bat`** - Double-click to launch app
+- **`dev.bat`** - Development mode with auto-reload
+
+### App Components
 - **`app.py`** - Main Streamlit interface
 - **`twitter_chunker.py`** - Core chunking logic
+- **`twitter_auth.py`** - Twitter API authentication
+- **`twitter_poster.py`** - Tweet posting functionality
 - **`launcher.py`** - Launch script with venv support
+
+### Configuration
 - **`requirements.txt`** - Python dependencies
+- **`secrets_template.toml`** - Template for Twitter API credentials
+- **`README.md`** - This documentation
 - **`venv/`** - Virtual environment (created by setup.bat)
 
 ## 🖥️ Creating Desktop Shortcut
@@ -56,20 +66,61 @@ python launcher.py
 
 ## 📱 How to Use
 
-1. Launch the app (browser will open automatically)
-2. Either type/paste your text or upload a .txt file
-3. See your text automatically chunked into tweets
-4. Copy individual tweets or the entire thread
-5. Paste into Twitter or your scheduling tool
+1. **Launch the app** (browser will open automatically)
+2. **Enter your text** - Either type/paste or upload a .txt file
+3. **Generate thread** - See your text automatically chunked into tweets
+4. **Post to Twitter** (optional):
+   - Configure Twitter API credentials (one-time setup)
+   - Review and post your thread directly to Twitter
+5. **Or copy manually** - Copy individual tweets or entire thread for manual posting
+
+## 🐦 Twitter Posting Setup
+
+To enable direct posting to Twitter:
+
+1. **Get Twitter API Access**:
+   - Go to [Twitter Developer Portal](https://developer.twitter.com/en/portal/dashboard)
+   - Create a new app (or use existing one)
+   - Generate API keys with **Read and Write** permissions
+
+2. **Configure Credentials** (choose one method):
+   
+   **Method A: In-App Setup (Easiest)**
+   - Run the app and click "Configure Twitter Access"
+   - Enter your API credentials when prompted
+   
+   **Method B: Secrets File (For Advanced Users)**
+   - Copy `secrets_template.toml` to `.streamlit/secrets.toml`
+   - Replace the placeholder values with your actual API credentials
+
+3. **Start Posting**:
+   - Generate your thread as usual
+   - Click "Post to Twitter" in the right panel
+   - Review and confirm your thread
+   - Watch it post automatically! 🚀
 
 ## ✨ Features
 
+### Core Features
 - ✅ Automatically splits at word boundaries
 - ✅ Adds thread indicators (1/5, 2/5, etc.)
 - ✅ Shows character counts and warnings
 - ✅ Individual and bulk copy options
-- ✅ File upload support
-- ✅ Clean, easy-to-use interface
+- ✅ File upload support (.txt files)
+
+### Twitter Integration
+- ✅ **Direct posting** to Twitter
+- ✅ **Thread creation** with proper reply chains
+- ✅ **Real-time validation** before posting
+- ✅ **Posting progress** with live updates
+- ✅ **Rate limit compliance** with automatic delays
+- ✅ **Error handling** and retry logic
+- ✅ **Secure credential** management
+
+### Interface
+- ✅ Clean, three-column layout
+- ✅ Real-time character counting
+- ✅ Thread statistics and validation
 - ✅ Isolated virtual environment (no conflicts!)
 
 ## 🛠️ Troubleshooting

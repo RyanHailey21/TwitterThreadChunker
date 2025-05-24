@@ -5,6 +5,8 @@ Clean UI layer that imports the core logic
 
 import streamlit as st
 from twitter_chunker import chunk_text_for_twitter, get_thread_stats, format_thread_for_export
+from twitter_auth import setup_twitter_credentials_ui, create_twitter_client
+from twitter_poster import show_posting_preview, post_thread, show_posting_results
 
 
 def main():
@@ -19,8 +21,14 @@ def main():
     st.title("🧵 Twitter Thread Chunker")
     st.markdown("Transform your long thoughts into perfectly sized Twitter threads!")
     
-    # Create two columns
-    col1, col2 = st.columns([1, 1])
+    # Initialize session state for posting
+    if "posting_confirmed" not in st.session_state:
+        st.session_state.posting_confirmed = False
+    if "current_tweets" not in st.session_state:
+        st.session_state.current_tweets = []
+    
+    # Create three columns for better layout
+    col1, col2, col3 = st.columns([1, 1, 0.8])
     
     with col1:
         st.subheader("📝 Input Your Text")
@@ -68,6 +76,9 @@ def main():
                 tweets, warnings = chunk_text_for_twitter(text_input)
             
             if tweets:
+                # Store tweets in session state for posting
+                st.session_state.current_tweets = tweets
+                
                 # Get and display stats
                 stats = get_thread_stats(tweets)
                 st.success(f"✅ Generated {stats['total_tweets']} tweets for your thread!")
@@ -130,6 +141,85 @@ def main():
         
         elif not text_input:
             st.info("👆 Enter some text on the left to see the magic happen!")
+
+    with col3:
+        st.subheader("🚀 Post to Twitter")
+        
+        # Check if we have tweets to post
+        if st.session_state.current_tweets:
+            tweets = st.session_state.current_tweets
+            
+            # Twitter authentication setup
+            twitter_configured = setup_twitter_credentials_ui()
+            
+            if twitter_configured:
+                st.divider()
+                
+                # Show posting controls
+                st.markdown("### Ready to Post!")
+                st.info(f"📊 {len(tweets)} tweets ready")
+                
+                # Quick validation display
+                validation_errors = []
+                for i, tweet in enumerate(tweets):
+                    if len(tweet) > 280:
+                        validation_errors.append(f"Tweet {i+1} too long")
+                
+                if validation_errors:
+                    st.error("❌ Issues found:")
+                    for error in validation_errors:
+                        st.write(f"• {error}")
+                else:
+                    st.success("✅ All tweets valid")
+                    
+                    # Posting controls
+                    delay = st.slider(
+                        "⏱️ Delay (seconds)",
+                        min_value=1,
+                        max_value=10,
+                        value=3,
+                        help="Time between tweets"
+                    )
+                    
+                    # Estimate time
+                    total_time = len(tweets) * delay
+                    if total_time < 60:
+                        time_str = f"{total_time}s"
+                    else:
+                        time_str = f"{total_time//60}m {total_time%60}s"
+                    
+                    st.caption(f"📅 Estimated time: {time_str}")
+                    
+                    # Post button
+                    if st.button("🚀 Post Thread", type="primary", use_container_width=True):
+                        st.session_state.posting_confirmed = True
+                    
+                    # Handle posting
+                    if st.session_state.posting_confirmed:
+                        st.warning("⚠️ Posting to Twitter...")
+                        
+                        # Post the thread
+                        results = post_thread(tweets, delay)
+                        
+                        # Show results
+                        show_posting_results(results)
+                        
+                        # Reset confirmation state
+                        st.session_state.posting_confirmed = False
+                        
+                        if results["success_count"] > 0:
+                            st.balloons()
+            
+            else:
+                st.info("🔐 Configure Twitter API credentials above to enable posting")
+                
+        else:
+            st.info("👈 Generate a thread first to enable posting")
+            
+            # Show Twitter setup even without tweets
+            st.markdown("### Setup Twitter API")
+            with st.expander("🔧 Configure Twitter Access", expanded=False):
+                setup_twitter_credentials_ui()
 
     # Footer
     st.markdown("---")
