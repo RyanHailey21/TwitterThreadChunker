@@ -84,7 +84,7 @@ def setup_twitter_credentials_ui() -> bool:
     """)
     
     # Credential input form
-    with st.form("twitter_credentials"):
+    with st.form("twitter_credentials_form"):
         st.markdown("**Enter your Twitter API credentials:**")
         
         new_consumer_key = st.text_input(
